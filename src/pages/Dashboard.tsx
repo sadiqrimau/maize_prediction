@@ -126,14 +126,14 @@ export function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total Records"
-            value={loading ? '—' : historicalData.length || 106}
+            value={loading ? '…' : historicalData.length || 106}
             icon={Database}
             subtitle="Monthly observations"
             delay={0}
           />
           <StatsCard
             title="Date Range"
-            value={loading ? '—' : dateRange}
+            value={loading ? '…' : dateRange}
             icon={Calendar}
             subtitle="Training data window"
             delay={80}
@@ -175,9 +175,30 @@ export function Dashboard() {
 
           <div className="p-6">
             {loading && (
-              <div className="flex flex-col gap-3 h-72 justify-center items-center">
-                <div className="w-8 h-8 rounded-full border-2 border-forest border-t-transparent animate-spin" />
-                <p className="text-sm text-forest-muted">Loading price data…</p>
+              <div className="space-y-3" aria-label="Loading chart">
+                {/* Y-axis + line skeleton */}
+                <div className="flex items-end gap-1 h-72">
+                  <div className="flex flex-col justify-between h-full py-2 w-10 flex-shrink-0">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="skeleton h-3 w-8 rounded" />
+                    ))}
+                  </div>
+                  <div className="flex-1 h-full flex items-end gap-1">
+                    {[...Array(24)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="skeleton flex-1 rounded-t"
+                        style={{ height: `${30 + Math.sin(i * 0.7) * 20 + Math.random() * 20}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {/* X-axis labels */}
+                <div className="flex gap-1 pl-11">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="skeleton h-3 flex-1 rounded" />
+                  ))}
+                </div>
               </div>
             )}
 
@@ -248,8 +269,14 @@ export function Dashboard() {
 
           <div className="p-6">
             {loading && (
-              <div className="flex justify-center items-center h-56">
-                <div className="w-8 h-8 rounded-full border-2 border-forest border-t-transparent animate-spin" />
+              <div className="flex items-end gap-2 h-56" aria-label="Loading seasonal chart">
+                {[...Array(12)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="skeleton flex-1 rounded-t"
+                    style={{ height: `${40 + Math.sin(i * 0.5) * 25 + 15}%` }}
+                  />
+                ))}
               </div>
             )}
 
