@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   LineChart, Line, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { Database, Calendar, TrendingUp, Target, AlertCircle } from 'lucide-react';
+import { Database, Calendar, TrendingUp, Target, AlertCircle, RefreshCw } from 'lucide-react';
 import { StatsCard } from '../components/StatsCard';
 import { api, HistoricalDataPoint } from '../utils/api';
 
@@ -39,12 +39,16 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
+    setLoading(true);
+    setError(null);
     api.getHistoricalData()
       .then((data) => { setHistoricalData(data); setError(null); })
-      .catch(() => setError('Unable to load historical data. The API may be waking up — please try again.'))
+      .catch(() => setError('Unable to load historical data. The API server may still be waking up — please retry.'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   /* ── Chart data helpers ─────────────────────────── */
   const chartData = historicalData.map((item) => ({
@@ -180,9 +184,15 @@ export function Dashboard() {
             {error && (
               <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 text-sm text-amber-800">
                 <AlertCircle size={18} className="flex-shrink-0 mt-0.5 text-amber-600" />
-                <div>
+                <div className="flex-1">
                   <p className="font-medium">Data unavailable</p>
                   <p className="text-amber-700 mt-0.5">{error}</p>
+                  <button
+                    onClick={loadData}
+                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-semibold transition-colors duration-150"
+                  >
+                    <RefreshCw size={12} /> Retry
+                  </button>
                 </div>
               </div>
             )}

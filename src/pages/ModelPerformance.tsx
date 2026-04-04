@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
-import { Award, BarChart2, AlertCircle } from 'lucide-react';
+import { Award, BarChart2, AlertCircle, RefreshCw } from 'lucide-react';
 import { api, type ModelStats } from '../utils/api';
 
 const MODEL_DISPLAY: Record<string, { name: string; short: string; desc: string }> = {
@@ -28,12 +28,16 @@ export function ModelPerformance() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadStats = useCallback(() => {
+    setLoading(true);
+    setError(null);
     api.getModelStats()
       .then((data) => { setModelStats(data); setError(null); })
-      .catch(() => setError('Unable to load model statistics. Please refresh.'))
+      .catch(() => setError('Unable to load model statistics. The API server may still be waking up — please retry.'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
 
   const bestModel = modelStats.length
     ? modelStats.reduce((best, cur) => (cur.mape < best.mape ? cur : best))
@@ -82,7 +86,16 @@ export function ModelPerformance() {
         {error && (
           <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-sm">
             <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-red-700">{error}</p>
+            <div className="flex-1">
+              <p className="font-semibold text-red-800">Failed to load statistics</p>
+              <p className="text-red-700 mt-0.5">{error}</p>
+              <button
+                onClick={loadStats}
+                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 text-xs font-semibold transition-colors duration-150"
+              >
+                <RefreshCw size={12} /> Retry
+              </button>
+            </div>
           </div>
         )}
 

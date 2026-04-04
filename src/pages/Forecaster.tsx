@@ -107,7 +107,7 @@ export function Forecaster() {
       const result = await api.predictPrice(form);
       setPrediction({ price: result.predicted_price, model: result.model_used });
     } catch {
-      setError('Prediction failed. The API may be waking up from sleep — please try again in 30 seconds.');
+      setError('Prediction failed after 3 attempts. If the server just woke up, wait 30 seconds and try again.');
     } finally {
       setLoading(false);
     }
