@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --forest: #1a5c2a;
+  --forest-dark: #0f3d1a;
+  --forest-light: #2a7a3e;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --cream: #f5f4f0;
+}
+
+@layer base {
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background-color: var(--cream);
+    color: #0f1f0f;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f0f7f2;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1a5c2a;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* ── Animations ────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(201, 168, 76, 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Stat cards staggered entrance ─────────────── */
+.stat-card {
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Page sections ──────────────────────────────── */
+.page-enter {
+  animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.chart-enter {
+  animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+/* ── Prediction result panel ─────────────────── */
+.prediction-reveal {
+  animation: scaleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Loading skeleton ────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #e8ede8 25%, #d4ead9 50%, #e8ede8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 4px;
+}
+
+/* ── Hero grain overlay ──────────────────────── */
+.hero-grain {
+  position: relative;
+  overflow: hidden;
+}
+.hero-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Gold gradient text ──────────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #c9a84c 0%, #e8c97a 50%, #c9a84c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Nav active indicator ────────────────────── */
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #c9a84c;
+  border-radius: 1px 1px 0 0;
+}
+
+/* ── Custom recharts tooltip ─────────────────── */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  border: 1px solid #e2ede4 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(26, 92, 42, 0.12) !important;
+}
+
+/* ── Table row hover ─────────────────────────── */
+.table-row-hover:hover {
+  background-color: #f0f7f2;
+  transition: background-color 0.15s ease;
+}
+
+/* ── Model badge pulse ───────────────────────── */
+.badge-best {
+  animation: pulseGold 2.5s ease-in-out infinite;
+}
