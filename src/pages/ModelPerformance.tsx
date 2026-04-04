@@ -7,7 +7,9 @@ import { Award, BarChart2, AlertCircle, RefreshCw } from 'lucide-react';
 import { api, type ModelStats } from '../utils/api';
 
 const MODEL_DISPLAY: Record<string, { name: string; short: string; desc: string }> = {
-  svr:   { name: 'Support Vector Regression', short: 'SVR',          desc: 'Kernel-based regression with excellent non-linear boundary detection' },
+  // API key is "svm"; legacy alias "svr" kept for safety
+  svm:   { name: 'Support Vector Machine',    short: 'SVM',           desc: 'Kernel-based regression with excellent non-linear boundary detection' },
+  svr:   { name: 'Support Vector Regression', short: 'SVR',           desc: 'Kernel-based regression with excellent non-linear boundary detection' },
   rf:    { name: 'Random Forest',             short: 'Random Forest', desc: 'Ensemble of decision trees with bootstrap aggregation' },
   arima: { name: 'ARIMA',                     short: 'ARIMA',         desc: 'Auto-regressive integrated moving average time-series model' },
   lstm:  { name: 'LSTM Neural Network',       short: 'LSTM',          desc: 'Long Short-Term Memory deep learning sequence model' },

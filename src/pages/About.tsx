@@ -126,8 +126,8 @@ export function About() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               {
-                short: 'SVR',
-                name: 'Support Vector Regression',
+                short: 'SVM',
+                name: 'Support Vector Machine',
                 best: true,
                 desc: 'Uses kernel functions to map inputs into high-dimensional feature space, enabling effective modelling of non-linear price relationships. Best performer at 15.7% MAPE.',
                 detail: '15.7% MAPE · Recommended',

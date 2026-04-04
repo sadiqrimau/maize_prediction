@@ -140,9 +140,9 @@ export function Dashboard() {
           />
           <StatsCard
             title="Best Model"
-            value="SVR"
+            value="SVM"
             icon={TrendingUp}
-            subtitle="Support Vector Regression"
+            subtitle="Support Vector Machine"
             delay={160}
           />
           <StatsCard

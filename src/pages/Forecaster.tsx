@@ -75,7 +75,7 @@ function InputField({
 
 /* ── Models config ──────────────────────────────── */
 const MODELS = [
-  { value: 'svr',   label: 'SVR',           description: 'Support Vector Regression — best performer (15.7% MAPE)', recommended: true  },
+  { value: 'svm',   label: 'SVM',           description: 'Support Vector Machine — best performer (15.7% MAPE)', recommended: true  },
   { value: 'rf',    label: 'Random Forest',  description: 'Ensemble of decision trees, robust to outliers',         recommended: false },
   { value: 'arima', label: 'ARIMA',          description: 'Classical time-series model, strong seasonality capture', recommended: false },
   { value: 'lstm',  label: 'LSTM',           description: 'Deep learning RNN, learns long-range dependencies',       recommended: false },
@@ -87,7 +87,7 @@ export function Forecaster() {
     cloud_amount: 50,
     precipitation: 100,
     temperature: 28,
-    model: 'svr',
+    model: 'svm',
   });
   const [prediction, setPrediction] = useState<{ price: number; model: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -289,7 +289,7 @@ export function Forecaster() {
                   <div className="text-5xl font-bold text-white font-display leading-none">
                     ₦{prediction.price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                   </div>
-                  <p className="text-white/60 text-sm mt-2">per 100 kg of maize</p>
+                  <p className="text-white/60 text-sm mt-2">NGN per kg of maize</p>
                 </div>
                 <div className="px-6 py-4 space-y-3">
                   <div className="flex items-center justify-between text-sm">
