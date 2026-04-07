@@ -71,6 +71,22 @@ export interface PredictionResponse {
   model_used: string;
 }
 
+export interface ValidationPoint {
+  date: string;
+  actual_price: number;
+  predicted_price: number | null;
+  model: string;
+}
+
+export interface ValidationAllPoint {
+  date: string;
+  actual_price: number | null;
+  svm:   number | null;
+  rf:    number | null;
+  arima: number | null;
+  lstm:  number | null;
+}
+
 /* ── Normalisation helpers ─────────────────────────── */
 
 /**
@@ -195,6 +211,24 @@ export const api = {
     if (!response.ok) throw new Error(`Failed to fetch model statistics (${response.status})`);
     const raw = await response.json();
     return normaliseModelStats(raw);
+  },
+
+  async getValidation(): Promise<ValidationPoint[]> {
+    const response = await fetchWithRetry(`${API_BASE_URL}/api/validation`);
+    if (!response.ok) throw new Error(`Failed to fetch validation data (${response.status})`);
+    const raw = await response.json();
+    console.log('[api] /api/validation raw response:', raw);
+    const items: unknown[] = Array.isArray(raw) ? raw : Array.isArray((raw as any)?.data) ? (raw as any).data : [];
+    return items as ValidationPoint[];
+  },
+
+  async getValidationAll(): Promise<ValidationAllPoint[]> {
+    const response = await fetchWithRetry(`${API_BASE_URL}/api/validation/all`);
+    if (!response.ok) throw new Error(`Failed to fetch validation/all data (${response.status})`);
+    const raw = await response.json();
+    console.log('[api] /api/validation/all raw response:', raw);
+    const items: unknown[] = Array.isArray(raw) ? raw : Array.isArray((raw as any)?.data) ? (raw as any).data : [];
+    return items as ValidationAllPoint[];
   },
 
   async predictPrice(data: PredictionRequest): Promise<PredictionResponse> {
