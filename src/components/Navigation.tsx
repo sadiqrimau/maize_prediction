@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sprout } from 'lucide-react';
+import { Menu, X, Sprout, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { getUser } from '../utils/auth';
 
 type ApiStatus = 'checking' | 'online' | 'offline';
 
@@ -29,11 +30,12 @@ function ApiStatusDot({ status }: { status: ApiStatus }) {
   );
 }
 
-export function Navigation() {
-  const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+export function Navigation({ onLogout }: { onLogout: () => void }) {
+  const location  = useLocation();
+  const [isOpen,    setIsOpen]    = useState(false);
+  const [scrolled,  setScrolled]  = useState(false);
   const [apiStatus, setApiStatus] = useState<ApiStatus>('checking');
+  const user = getUser();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -91,7 +93,7 @@ export function Navigation() {
             </div>
           </Link>
 
-          {/* Desktop nav — scrollable on smaller screens */}
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-0.5 overflow-x-auto flex-1 justify-center">
             {links.map((link) => {
               const active = location.pathname === link.path;
@@ -114,12 +116,22 @@ export function Navigation() {
             })}
           </nav>
 
-          {/* Right side: API status + flag */}
+          {/* Right side: API status + flag + user + logout */}
           <div className="hidden md:flex items-center gap-3 flex-shrink-0">
             <ApiStatusDot status={apiStatus} />
             <div className="flex items-center gap-2 pl-3 border-l border-forest-border">
               <span className="text-lg leading-none">🇳🇬</span>
               <span className="text-xs text-forest-muted font-medium">Adamawa</span>
+            </div>
+            <div className="flex items-center gap-2 pl-3 border-l border-forest-border">
+              <span className="text-xs text-forest-muted font-medium capitalize">{user}</span>
+              <button
+                onClick={onLogout}
+                title="Sign out"
+                className="p-1.5 rounded-lg text-forest-muted hover:text-red-500 hover:bg-red-50 transition-colors duration-150"
+              >
+                <LogOut size={14} />
+              </button>
             </div>
           </div>
 
@@ -163,7 +175,15 @@ export function Navigation() {
                 <span className="text-lg">🇳🇬</span>
                 <span className="text-xs text-forest-muted">Adamawa State, Nigeria</span>
               </div>
-              <ApiStatusDot status={apiStatus} />
+              <div className="flex items-center gap-3">
+                <ApiStatusDot status={apiStatus} />
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-1.5 text-xs text-red-500 font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
+                >
+                  <LogOut size={13} /> Sign out
+                </button>
+              </div>
             </div>
           </div>
         </div>

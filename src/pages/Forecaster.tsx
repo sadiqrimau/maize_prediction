@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
   TrendingUp, Cloud, Droplets, Thermometer, Calendar,
-  ChevronDown, Sparkles, AlertCircle, Info,
+  ChevronDown, Sparkles, AlertCircle, Info, RefreshCw, MapPin,
 } from 'lucide-react';
 import { api, type PredictionRequest } from '../utils/api';
+import { fetchCurrentMonthWeather } from '../utils/weather';
 
 /* ── Model option card ──────────────────────────── */
 function ModelCard({
@@ -81,22 +82,49 @@ const MODELS = [
   { value: 'lstm',  label: 'LSTM',           description: 'Deep learning RNN, learns long-range dependencies',       recommended: false },
 ];
 
+type WeatherStatus = 'idle' | 'loading' | 'loaded' | 'error';
+
 export function Forecaster() {
   const [form, setForm] = useState<PredictionRequest>({
-    month: 1,
-    cloud_amount: 50,
+    month:         new Date().getMonth() + 1,
+    cloud_amount:  50,
     precipitation: 100,
-    temperature: 28,
-    model: 'svm',
+    temperature:   28,
+    model:         'svm',
   });
-  const [prediction, setPrediction] = useState<{ price: number; model: string } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [prediction,     setPrediction]     = useState<{ price: number; model: string } | null>(null);
+  const [loading,        setLoading]        = useState(false);
+  const [error,          setError]          = useState<string | null>(null);
+  const [weatherStatus,  setWeatherStatus]  = useState<WeatherStatus>('idle');
+  const [weatherLabel,   setWeatherLabel]   = useState<string>('');
 
   const months = [
     'January','February','March','April','May','June',
     'July','August','September','October','November','December',
   ];
+
+  // Auto-fetch weather on first load
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+
+  const fetchWeather = async () => {
+    setWeatherStatus('loading');
+    try {
+      const w = await fetchCurrentMonthWeather();
+      setForm((prev) => ({
+        ...prev,
+        month:         w.month,
+        cloud_amount:  w.cloud_amount,
+        precipitation: w.precipitation,
+        temperature:   w.temperature,
+      }));
+      setWeatherLabel(w.label);
+      setWeatherStatus('loaded');
+    } catch {
+      setWeatherStatus('error');
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -128,7 +156,7 @@ export function Forecaster() {
             <h1 className="font-display text-2xl font-bold text-forest-dark">Price Forecaster</h1>
           </div>
           <p className="text-sm text-forest-muted ml-11">
-            Enter climate and calendar parameters to generate a market price forecast.
+            Climate parameters are auto-filled from live weather data for Adamawa State. You can adjust them manually.
           </p>
         </div>
       </div>
@@ -138,6 +166,43 @@ export function Forecaster() {
 
           {/* ── Input form ───────────────────────────── */}
           <div className="lg:col-span-3 space-y-6">
+
+            {/* Weather status banner */}
+            <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border text-sm transition-all duration-300 ${
+              weatherStatus === 'loaded'
+                ? 'bg-forest-50 border-forest-100 text-forest-dark'
+                : weatherStatus === 'loading'
+                ? 'bg-amber-50 border-amber-100 text-amber-800'
+                : weatherStatus === 'error'
+                ? 'bg-red-50 border-red-100 text-red-700'
+                : 'bg-gray-50 border-gray-100 text-gray-500'
+            }`}>
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="flex-shrink-0" />
+                <span className="text-xs font-medium">
+                  {weatherStatus === 'loading' && 'Fetching live weather for Yola, Adamawa…'}
+                  {weatherStatus === 'loaded'  && weatherLabel}
+                  {weatherStatus === 'error'   && 'Could not fetch live weather — using default values'}
+                  {weatherStatus === 'idle'    && 'Weather data not yet loaded'}
+                </span>
+                {weatherStatus === 'loading' && (
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={fetchWeather}
+                disabled={weatherStatus === 'loading'}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg
+                           bg-white border border-forest-border text-forest
+                           hover:bg-forest-50 disabled:opacity-40 disabled:cursor-not-allowed
+                           transition-colors duration-150 flex-shrink-0"
+              >
+                <RefreshCw size={12} className={weatherStatus === 'loading' ? 'animate-spin' : ''} />
+                Refresh
+              </button>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
 
               {/* Environmental inputs */}
@@ -262,9 +327,9 @@ export function Forecaster() {
                 <div>
                   <p className="text-xs font-semibold text-forest-dark mb-1">How it works</p>
                   <p className="text-xs text-forest-muted leading-relaxed">
-                    The model uses your climate inputs combined with the calendar month to estimate
-                    maize market prices in Adamawa State. SVR is recommended — it achieved the lowest
-                    error (15.7% MAPE) on historical data.
+                    Climate inputs are automatically filled using live weather data from
+                    Open-Meteo for Yola, Adamawa State. You can override any value manually
+                    before generating a forecast. SVM is recommended — it achieved 15.7% MAPE.
                   </p>
                 </div>
               </div>
